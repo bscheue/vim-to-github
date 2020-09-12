@@ -51,14 +51,14 @@ endfunction
 function! s:copy_to_clipboard(url)
   if exists('g:to_github_clip_command')
     call system(g:to_github_clip_command, a:url)
-  elseif has('unix') && !has('xterm_clipboard')
+  elseif has('unix') && !has('clipboard')
     let @" = a:url
   else
     let @+ = a:url
   endif
 endfunction
 
-function! ToGithub(count, line1, line2, ...)
+function! ToGithub(count, line1, line2, clipboard, ...)
   let github_url = 'https://github.com'
   let get_remote = 'git remote -v | grep -E "github\.com.*\(fetch\)" | head -n 1'
   let get_username = 'sed -E "s/.*com[:\/](.*)\/.*/\\1/"'
@@ -84,11 +84,12 @@ function! ToGithub(count, line1, line2, ...)
     let line = '#L' . a:line1 . '-L' . a:line2
   endif
 
-  if get(g:, 'to_github_clipboard', 0)
+  if a:clipboard
     return s:copy_to_clipboard(url . line)
   else
     return s:open_browser(url . line)
   endif
 endfunction
 
-command! -nargs=? -range ToGithub :call ToGithub(<count>, <line1>, <line2>, <f-args>)
+command! -nargs=? -range ToGithub          :call ToGithub(<count>, <line1>, <line2>, 0, <f-args>)
+command! -nargs=? -range ToGithubClipboard :call ToGithub(<count>, <line1>, <line2>, 1, <f-args>)
