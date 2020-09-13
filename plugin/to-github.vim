@@ -59,6 +59,12 @@ function! s:copy_to_clipboard(url)
 endfunction
 
 function! ToGithub(count, line1, line2, clipboard, ...)
+  if len(a:000) == 0
+    let commit = s:run('git rev-parse HEAD')
+  else
+    let commit = a:000[0] == "." ? s:run('git rev-parse --abbrev-ref HEAD') : a:000[0]
+  endif
+
   let github_url = 'https://github.com'
   let get_remote = 'git remote -v | grep -E "github\.com.*\(fetch\)" | head -n 1'
   let get_username = 'sed -E "s/.*com[:\/](.*)\/.*/\\1/"'
@@ -68,9 +74,6 @@ function! ToGithub(count, line1, line2, clipboard, ...)
   " Get the username and repo.
   let username = s:run(get_remote, get_username)
   let repo = s:run(get_remote, get_repo, optional_ext)
-
-  " Get the commit and path, and form the complete url.
-  let commit = get(a:000, 0, s:run('git rev-parse HEAD'))
 
   let repo_root = s:run('git rev-parse --show-toplevel')
   let file_path = expand('%:p')
