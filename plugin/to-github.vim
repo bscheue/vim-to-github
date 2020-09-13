@@ -58,7 +58,7 @@ function! s:copy_to_clipboard(url)
   endif
 endfunction
 
-function! ToGithub(count, line1, line2, clipboard, ...)
+function! ToGithub(range, line1, line2, clipboard, ...)
   if len(a:000) == 0
     let commit = s:run('git rev-parse HEAD')
   else
@@ -81,7 +81,9 @@ function! ToGithub(count, line1, line2, clipboard, ...)
   let url = join([github_url, username, repo, 'blob', commit, file_path], '/')
 
   " Finally set the line numbers if necessary.
-  if a:count == -1
+  if a:range == 0
+    let line = ''
+  elseif a:range == 1
     let line = '#L' . line('.')
   else
     let line = '#L' . a:line1 . '-L' . a:line2
@@ -94,5 +96,5 @@ function! ToGithub(count, line1, line2, clipboard, ...)
   endif
 endfunction
 
-command! -nargs=? -range ToGithub          :call ToGithub(<count>, <line1>, <line2>, 0, <f-args>)
-command! -nargs=? -range ToGithubClipboard :call ToGithub(<count>, <line1>, <line2>, 1, <f-args>)
+command! -nargs=? -range ToGithub          :call ToGithub(<range>, <line1>, <line2>, 0, <f-args>)
+command! -nargs=? -range ToGithubClipboard :call ToGithub(<range>, <line1>, <line2>, 1, <f-args>)
