@@ -58,7 +58,7 @@ function! s:copy_to_clipboard(url)
   endif
 endfunction
 
-function! ToGithub(count, line1, line2, ...)
+function! ToGithub(range, line1, line2, ...)
   let github_url = 'https://github.com'
   let get_remote = 'git remote -v | grep -E "github\.com.*\(fetch\)" | head -n 1'
   let get_username = 'sed -E "s/.*com[:\/](.*)\/.*/\\1/"'
@@ -87,7 +87,9 @@ function! ToGithub(count, line1, line2, ...)
   let url = join([github_url, username, repo, 'blob', commit, file_path], '/')
 
   " Finally set the line numbers if necessary.
-  if a:count == -1
+  if a:range == 0
+    let line = ''
+  elseif a:range == 1
     let line = '#L' . line('.')
   else
     let line = '#L' . a:line1 . '-L' . a:line2
@@ -100,4 +102,4 @@ function! ToGithub(count, line1, line2, ...)
   endif
 endfunction
 
-command! -nargs=* -range ToGithub :call ToGithub(<count>, <line1>, <line2>, <f-args>)
+command! -nargs=* -range ToGithub :call ToGithub(<range>, <line1>, <line2>, <f-args>)
